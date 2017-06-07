@@ -97,7 +97,7 @@
               <org.mule.common.metadata.DefaultMetaDataField>
                 <name>To be delivered by</name>
                 <model class="org.mule.common.metadata.DefaultSimpleMetaDataModel">
-                  <dataType>STRING</dataType>
+                  <dataType>DATE_TIME</dataType>
                   <metaDataModelPropertiesManager>
                     <properties/>
                   </metaDataModelPropertiesManager>

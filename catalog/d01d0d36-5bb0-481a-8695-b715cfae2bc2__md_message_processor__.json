@@ -5,12 +5,7 @@
             "typeId": "xlsx"
         }
     },
-    "outputMessageMetadata": {
-        "messagePayload": {
-            "connectorName": "#_custom_mule_metadata_type_#",
-            "typeId": "base-data-json"
-        }
-    },
+    "outputMessageMetadata": {},
     "id": "d01d0d36-5bb0-481a-8695-b715cfae2bc2",
     "version": "5.2.0.0"
 }

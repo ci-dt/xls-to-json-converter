@@ -1,23 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:spring="http://www.springframework.org/schema/beans" 
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<mule xmlns:objectstore="http://www.mulesoft.org/schema/mule/objectstore"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw"
+	xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
-http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd">
-    <file:connector name="File" autoDelete="true" streaming="true" validateConnections="true" doc:name="File"/>
-    <flow name="xls-to-csv-converterFlow">
-        <file:inbound-endpoint path="input" moveToDirectory="processed" connector-ref="File" responseTimeout="10000" doc:name="File"/>
-        <dw:transform-message doc:name="Transform Message" metadata:id="d01d0d36-5bb0-481a-8695-b715cfae2bc2">
-            <dw:input-payload mimeType="application/xlsx"/>
-            <dw:set-payload><![CDATA[%dw 1.0
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd
+http://www.mulesoft.org/schema/mule/objectstore http://www.mulesoft.org/schema/mule/objectstore/current/mule-objectstore.xsd">
+	<file:connector name="File" autoDelete="true" streaming="true"
+		validateConnections="true" doc:name="File" />
+	<objectstore:config name="ObjectStore__Connector"
+		partition="worksheet" doc:name="ObjectStore: Connector" />
+	<flow name="xls-to-csv-converterFlow">
+		<file:inbound-endpoint path="input"
+			moveToDirectory="processed" connector-ref="File" responseTimeout="10000"
+			doc:name="File" />
+		<dw:transform-message doc:name="Transform Message"
+			metadata:id="d01d0d36-5bb0-481a-8695-b715cfae2bc2">
+			<dw:input-payload mimeType="application/xlsx" />
+			<dw:set-payload><![CDATA[%dw 1.0
 %output application/json
 ---
-payload]]></dw:set-payload>
-        </dw:transform-message>
-        <logger message="Excel Sheet 1 #[payload]" level="INFO" doc:name="Logger"/>
-        <file:outbound-endpoint path="json" outputPattern="xlsx-to-json.json" responseTimeout="10000" doc:name="JSON output"/>
-    </flow>
+payload.Sheet1 map {
+	"Overview": [
+    {
+		"ID": $.ID,
+		"Materialkurztext": $.Materialkurztext,
+		"Material": $.Material,
+		"Size & Dim": $."Size & Dim",
+		"Weight": $.Weight,
+		"To be delivered by": $."To be delivered by",
+		"To be delivered at": $."To be delivered at",
+		"Next operation by": $."Next operation by",
+		"Next operation at": $."Next operation at",
+		"Current Location": $."Current Location"
+	}
+  
+    ]
+}]]></dw:set-payload>
+
+		</dw:transform-message>
+		<logger message="Excel Sheet 1 #[payload]" level="INFO"
+			doc:name="Logger" />
+		<file:outbound-endpoint path="json"
+			outputPattern="xlsx-to-json.json" responseTimeout="10000" doc:name="JSON output" />
+	</flow>
 </mule>
